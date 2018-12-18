@@ -1,4 +1,4 @@
-//#region Globals Requirements
+//#region Requirements
 var mongo = require('../../frontend/express/node_modules/mongoskin');
 var async = require('../../api/utils/async.min.js');
 var fs = require('fs');
