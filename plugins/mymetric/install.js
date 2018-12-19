@@ -1,6 +1,6 @@
 //#region Requirements
-var mongo = require('../../frontend/express/node_modules/mongoskin');
-var async = require('../../api/utils/async.min.js');
+var mongo = require('../../node_modules/mongoskin');
+var async = require('async');
 var fs = require('fs');
 var path = require("path");
 var countlyConfig = require('../../frontend/express/config');
