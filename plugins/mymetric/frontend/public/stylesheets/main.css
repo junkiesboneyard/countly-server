@@ -51,4 +51,9 @@
     background-clip: padding-box;
     border: 1px solid #ced4da;
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    cursor: pointer;
+}
+
+.mymetric-header .date-range-picker input:hover{
+    background-color: #f7f7f7;
 }

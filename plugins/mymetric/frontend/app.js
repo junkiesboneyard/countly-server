@@ -11,7 +11,11 @@ var utilsMyMetric = require('../api/utils.js');
                 //Get period for output data
                 let obPeriod = utilsMyMetric.fnGetPeriod(req.query.period);
                 if (!obPeriod.state) {//If period information not exists, set current default
-                    obPeriod = utilsMyMetric.fnGetPeriod("today");
+                    res.send({
+                        "status": "Fail",
+                        "errorText": obPeriod.errorText
+                    });
+                    return;
                 }
 
                 //Get metric information

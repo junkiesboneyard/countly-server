@@ -120,6 +120,12 @@ let fnCheckReadAPISyntax = (queryString) => {
 */
 let fnGetPeriod = (periodString) => {
     try {
+        if (!periodString) {
+            throw (new Error("periodString is undefined"));
+        }
+        if (typeof periodString != "string") {
+            throw (new Error("periodString is not a string"));
+        }
         switch (periodString) {
             case "today":
                 return {
@@ -157,6 +163,12 @@ let fnGetPeriod = (periodString) => {
                     "dStart": moment().subtract(7, 'days').startOf('day')._d,
                     "dEnd": moment().endOf('day')._d
                 }
+            case "last15":
+                return {
+                    "state": true,
+                    "dStart": moment().subtract(15, 'days').startOf('day')._d,
+                    "dEnd": moment().endOf('day')._d
+                }
             case "last30":
                 return {
                     "state": true,
@@ -174,22 +186,24 @@ let fnGetPeriod = (periodString) => {
                 if (periodString.indexOf(",") == -1) {
                     return { "state": false, "errorText": "Bad request parameter: period" };
                 }
-                let arTime = obParams.qstring.period.split(",");
+                let arTime = periodString.split(","),dStart,dEnd;
                 if (arTime.length != 2) {//Expected 2 item, start and end date
                     return { "state": false, "errorText": "Bad request parameter: period" };
                 }
-                if (!Date.parse(arTime[0]) || !Date.parse(arTime[1])) {
+                dStart = new Date(parseFloat(arTime[0]));
+                dEnd = new Date(parseFloat(arTime[1]));
+                if (!dStart || dStart == "Invalid Date" || !dEnd || dEnd == "Invalid Date") {
                     return { "state": false, "errorText": "Bad request parameter: period" };
                 }
                 return {
                     "state": true,
-                    "dStart": new Date(arTime[0]),
-                    "dEnd": new Date(arTime[1])
+                    "dStart": dStart,
+                    "dEnd": dEnd
                 }
         }
     }
     catch (e) {
-        fnSaveLog("MyMetric plugin fnGetPeriod failed. Error Message: " + e.message + ". Stack trace: " + e.stack);
+        fnPrintLog("MyMetric plugin fnGetPeriod failed. Error Message: " + e.message + ". Stack trace: " + e.stack);
         return { "state": false, "errorText": "Period preparing is failed." };
     }
 }

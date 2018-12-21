@@ -2,7 +2,9 @@ window.MyMetricView = countlyView.extend({
     initialize: function () {
         //we can initialize stuff here
         CountlyHelpers.loadJS("mymetric/javascripts/daterangepicker.js");
+        CountlyHelpers.loadJS("mymetric/javascripts/bootstrap-table.js");
         CountlyHelpers.loadCSS("mymetric/stylesheets/daterangepicker.css");
+        CountlyHelpers.loadCSS("mymetric/stylesheets/bootstrap-table.css");
     },
     beforeRender: function () {
         console.log("MyMetric plugin beforeRender called");
@@ -17,21 +19,17 @@ window.MyMetricView = countlyView.extend({
         }
     },
     renderCommon: function (isRefresh) {
-        console.log("MyMetric plugin renderCommon called");
         var myMetricData = myMetricPlugin.fnGetData();
         this.templateData = {
-            "page-title": "My Metric",
-            "title": "My Metric",
-            "content": "Content__",
-            "footer": "Footer__"
+            "page-title": "My Metric"
         };
-
         var self = this;
 
         if (!isRefresh) {
             $(this.el).html(this.template(this.templateData));
             setTimeout(function () {
-                $("#inputMyMetricRangePicker").daterangepicker({
+                //Prepare Range Picker
+                this.dpicker = $("#inputMyMetricRangePicker").daterangepicker({
                     maxDate: moment(),
                     opens: "left",
                     timePicker24Hour: false,
@@ -55,20 +53,47 @@ window.MyMetricView = countlyView.extend({
                         'Last 30 Days': [moment().subtract(30, 'days').startOf('day'), moment().endOf('day')],
                         'Last 60 Days': [moment().subtract(60, 'days').startOf('day'), moment().endOf('day')]
                     }
-                })
-                    .on('apply.daterangepicker', function (event, picker) {
-                        var rangePickerInput = $(this);
-                        var rangePicker = $(this).data('daterangepicker');
+                }).on('apply.daterangepicker', function (event, picker) {
+                    var rangePickerInput = $(this);
+                    var rangePicker = $(this).data('daterangepicker');
 
-                        rangePickerInput.val(moment(rangePicker.startDate).format('ll') + ' - ' + moment(rangePicker.endDate).format('ll'));
-                    })
+                    rangePickerInput.val(moment(rangePicker.startDate).format('ll') + ' - ' + moment(rangePicker.endDate).format('ll'));
+
+                    let filter = moment(rangePicker.startDate)._d.getTime() + "," + moment(rangePicker.endDate)._d.getTime();
+                    $.when(myMetricPlugin.fnGetMyMetric(filter)).done(function () {
+                        let myMetricDataNew = myMetricPlugin.fnGetData();
+                        $('#dataTableOne').dataTable().fnClearTable();
+                        $('#dataTableOne').dataTable().fnAddData(myMetricDataNew);
+                        $('#dataTableOne').dataTable().fnDraw();
+                    });
+                });
+                //Prepare Data Table
+                this.dtable = $('#dataTableOne').dataTable($.extend({}, $.fn.dataTable.defaults, {
+                    "aaData": myMetricData,
+                    "aoColumns": [
+                        {
+                            "mData": "dateString",
+                            "sTitle": "Date"
+                        },
+                        {
+                            "mData": "name",
+                            "sTitle": "Metric"
+                        },
+                        {
+                            "mData": "metricCount",
+                            "sTitle": "Count"
+                        }
+                    ]
+                }));
+                $("#dataTableOne").stickyTableHeaders();
             }, 250);
         }
-        console.log(myMetricData);
     },
     refresh: function () {
-        console.log("MyMetric plugin refresh called");
-        return;
+        if (app.activeView !== self) {
+            return false;
+        }
+        self.renderCommon(true);
     }
 });
 

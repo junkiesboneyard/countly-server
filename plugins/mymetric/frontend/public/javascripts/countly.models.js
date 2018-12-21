@@ -2,7 +2,40 @@
     //Private properties
     var _data = {};
     var fnGetMyMetricDone = (obResult) => {
-        _data = obResult;
+        if (obResult.arMyMetric && obResult.arMyMetric.length) {
+            let HASH = Object.create(null);
+            obResult.arMyMetric.forEach(function (obMyMetric) {
+                let hashKey = obMyMetric.name + moment(obMyMetric.date).startOf('day').format('ll');
+                if (!HASH[hashKey]) {
+                    HASH[hashKey] = {
+                        "date": moment(obMyMetric.date).startOf('day')._d,
+                        "dateString": moment(obMyMetric.date).startOf('day').format('ll'),
+                        "name": obMyMetric.name,
+                        "metricCount": 0
+                    }
+                }
+                HASH[hashKey].metricCount += parseInt(obMyMetric.count);
+            });
+            let ARRAY = [];
+            Object.keys(HASH).forEach(function (hashKey) {
+                ARRAY.push(HASH[hashKey]);
+            });
+            ARRAY.sort(function (a, b) {
+                aDate = new Date(a.date);
+                bDate = new Date(b.date);
+                if (aDate.getTime() > bDate.getTime()) {
+                    return 1;
+                }
+                else if (aDate.getTime() < bDate.getTime()) {
+                    return -1;
+                }
+                return 0;
+            });
+            _data = ARRAY;
+        }
+        else {
+            _data = [];
+        }
     };
     var fnAjaxCall = (obAjax, fnDone, fnFail, fnAlways) => {
         //Inputs    : obAjax:{ szUrl(R), obData(O), szTyp(R) }, fnDone(R), fnFail(O), fnAlways(O)
@@ -97,15 +130,12 @@
     //Public methods
     myMetricPlugin.initialize = () => {
         console.log("myMetricPlugin model initializing...");
-        return fnAjaxCall({
-            "szUrl": "/mymetric",
-            "szTyp": "GET"
-        }, fnGetMyMetricDone);
+        return myMetricPlugin.fnGetMyMetric("today");
     };
 
-    myMetricPlugin.fnGetDataWithPeriod = (periodString) => {
+    myMetricPlugin.fnGetMyMetric = (periodString) => {
         //we can initialize stuff here
-        fnAjaxCall({
+        return fnAjaxCall({
             "szUrl": "/mymetric",
             "szTyp": "GET",
             "obData": {
