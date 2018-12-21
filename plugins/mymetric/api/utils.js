@@ -42,11 +42,11 @@ let fnSaveLog = (anyMessage) => {
 };
 
 /**
-* Function take queryString, then check syntax is correct
+* Function take queryString, then check save mymetric request query syntax is correct
 * @param {string} queryString - Request query string
 * @returns {object} checkStatus - state(R) property for check operation status, errorText(O)
 */
-let fnCheckWriteAPISyntax = (queryString) => {
+let fnCheckSaveWriteAPISyntax = (queryString) => {
     try {
         if (!queryString.hasOwnProperty('app_key')) {
             return { "state": false, "errorText": "Missing request parameter: app_key" };
@@ -64,13 +64,32 @@ let fnCheckWriteAPISyntax = (queryString) => {
         return { "state": true };
     }
     catch (e) {
-        fnSaveLog("MyMetric plugin fnCheckWriteAPISyntax failed. Error Message: " + e.message + ". Stack trace: " + e.stack);
+        fnSaveLog("MyMetric plugin fnCheckSaveWriteAPISyntax failed. Error Message: " + e.message + ". Stack trace: " + e.stack);
         return { "state": false, "errorText": "Query string syntax check failed." };
     }
 }
 
 /**
-* Function take queryString, then check syntax is correct
+* Function take queryString, then check reset mymetric request query syntax is correct
+* @param {string} queryString - Request query string
+* @returns {object} checkStatus - state(R) property for check operation status, errorText(O)
+*/
+let fnCheckResetWriteAPISyntax = (queryString) => {
+    try {
+        if (!queryString.hasOwnProperty('app_key')) {
+            return { "state": false, "errorText": "Missing request parameter: app_key" };
+        }
+        //Syntax is correct
+        return { "state": true };
+    }
+    catch (e) {
+        fnSaveLog("MyMetric plugin fnCheckResetWriteAPISyntax failed. Error Message: " + e.message + ". Stack trace: " + e.stack);
+        return { "state": false, "errorText": "Query string syntax check failed." };
+    }
+}
+
+/**
+* Function take queryString, then check read mymetric request query syntax is correct
 * @param {string} queryString - Request query string
 * @returns {object} checkStatus - state(R) property for check operation status, errorText(O)
 */
@@ -178,7 +197,8 @@ let fnGetPeriod = (periodString) => {
 module.exports = {
     "fnPrintLog": fnPrintLog,
     "fnSaveLog": fnSaveLog,
-    "fnCheckWriteAPISyntax": fnCheckWriteAPISyntax,
+    "fnCheckSaveWriteAPISyntax": fnCheckSaveWriteAPISyntax,
+    "fnCheckResetWriteAPISyntax": fnCheckResetWriteAPISyntax,
     "fnCheckReadAPISyntax": fnCheckReadAPISyntax,
     "fnGetPeriod": fnGetPeriod
 };

@@ -13,7 +13,7 @@ var utilsMyMetric = require('./utils.js');
             let obParams = ob.params;
 
             //Check parameters.
-            let obCheckSyntax = utilsMyMetric.fnCheckWriteAPISyntax(obParams.qstring);
+            let obCheckSyntax = utilsMyMetric.fnCheckSaveWriteAPISyntax(obParams.qstring);
             if (!obCheckSyntax.state) {//Syntax is incorrect
                 common.returnMessage(obParams, 400, obCheckSyntax.errorText);
                 return true;
@@ -29,6 +29,35 @@ var utilsMyMetric = require('./utils.js');
                 "date": now
             }
             common.db.collection(configMyMetric["db"].collectionName).insertOne(obMyMetric, function (obErr, obRes) {
+                if (!obErr) {
+                    common.returnMessage(obParams, 200, "Success");
+                    return true;
+                }
+                else {
+                    common.returnMessage(obParams, 500, obErr.message);
+                    return false;
+                }
+            });
+        }
+        catch (e) {
+            common.returnMessage(ob.params, 500, "Failed. Error Message: " + e.message + ". Stack trace: " + e.stack);
+            return true;
+        }
+    });
+
+    plugins.register("/i/my-metric-reset", function (ob) {
+        try {
+            //Get request parameters
+            let obParams = ob.params;
+
+            //Check parameters.
+            let obCheckSyntax = utilsMyMetric.fnCheckResetWriteAPISyntax(obParams.qstring);
+            if (!obCheckSyntax.state) {//Syntax is incorrect
+                common.returnMessage(obParams, 400, obCheckSyntax.errorText);
+                return true;
+            }
+
+            common.db.collection(configMyMetric["db"].collectionName).remove({}, function (obErr, obRes) {
                 if (!obErr) {
                     common.returnMessage(obParams, 200, "Success");
                     return true;
