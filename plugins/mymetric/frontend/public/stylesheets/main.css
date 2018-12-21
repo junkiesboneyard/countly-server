@@ -57,3 +57,17 @@
 .mymetric-header .date-range-picker input:hover{
     background-color: #f7f7f7;
 }
+
+#svgMyMetric{
+    height: 320px;
+    margin-top: 15px;
+    background: white;
+    border: 0.5px solid #EEE;
+    display: inline-block;
+    padding-bottom: 15px;
+}
+
+#svgMyMetric .ct-line{
+    fill: none;
+    stroke-width: 2px;
+}

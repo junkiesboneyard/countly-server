@@ -24,10 +24,10 @@
                 aDate = new Date(a.date);
                 bDate = new Date(b.date);
                 if (aDate.getTime() > bDate.getTime()) {
-                    return 1;
+                    return -1;
                 }
                 else if (aDate.getTime() < bDate.getTime()) {
-                    return -1;
+                    return 1;
                 }
                 return 0;
             });
@@ -130,7 +130,7 @@
     //Public methods
     myMetricPlugin.initialize = () => {
         console.log("myMetricPlugin model initializing...");
-        return myMetricPlugin.fnGetMyMetric("today");
+        return myMetricPlugin.fnGetMyMetric("week");
     };
 
     myMetricPlugin.fnGetMyMetric = (periodString) => {

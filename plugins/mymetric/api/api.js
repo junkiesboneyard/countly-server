@@ -25,8 +25,13 @@ var utilsMyMetric = require('./utils.js');
                 "name": obParams.qstring.my_metric,
                 "count": parseInt(obParams.qstring.my_metric_count),
                 "app_key": obParams.qstring.app_key,
-                "device_id": obParams.qstring.device_id,
-                "date": now
+                "device_id": obParams.qstring.device_id
+            }
+            if(obParams.qstring.date && new Date(obParams.qstring.date) != "Invalid Date"){
+                obMyMetric.date = new Date(obParams.qstring.date);
+            }
+            else{
+                obMyMetric.date = now;
             }
             common.db.collection(configMyMetric["db"].collectionName).insertOne(obMyMetric, function (obErr, obRes) {
                 if (!obErr) {
